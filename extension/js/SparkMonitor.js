@@ -9,7 +9,7 @@ import $ from 'jquery';					  // Used for certain utility function in this modul
 import CellMonitor from './CellMonitor'   // CellMonitor object constructor
 import currentcell from './currentcell'   // Module to detect currently running cell
 
-/** 
+/**
  * SparkMonitor is the main singleton class that is responsible for managing CellMonitor instances for cells that run spark jobs.
  * It also delegates spark lifecycle events from the backend to corresponding CellMonitor.
  * @constructor
@@ -98,9 +98,18 @@ SparkMonitor.prototype.stopCellMonitor = function (cell_id) {
 
 /** Adds a button to the toolbar for toggling all monitoring dispalys. */
 SparkMonitor.prototype.createButtons = function () {
+
+    var showing = true;
+    var button;
+
 	var that = this;
 	var handler = function () {
-		that.toggleAll();
+        that.toggleAll();
+		if(showing = !showing) {
+            button.removeClass('disable');
+        } else {
+            button.addClass('disable');
+        }
 	};
 
 	var action = {
@@ -113,7 +122,9 @@ SparkMonitor.prototype.createButtons = function () {
 	var action_name = 'toggle-spark-monitoring';
 
 	var full_action_name = Jupyter.actions.register(action, action_name, prefix); // returns 'my_extension:show-alert'
-	Jupyter.toolbar.add_buttons_group([full_action_name]);
+    button = Jupyter.toolbar.add_buttons_group([full_action_name]);
+
+    button.addClass('extension_button');
 }
 
 //-----Functions to show/hide all displays
@@ -195,7 +206,7 @@ SparkMonitor.prototype.send = function (msg) {
 //------------Message Handling Functions that update the data and delegate to corresponding cell monitors--------------------------------
 
 /**
- * Called when a Spark job is started. 
+ * Called when a Spark job is started.
  * @param {Object} data - The data from the spark listener event.
  */
 SparkMonitor.prototype.onSparkJobStart = function (data) {
@@ -219,7 +230,7 @@ SparkMonitor.prototype.onSparkJobStart = function (data) {
 }
 
 /**
- * Called when a Spark job is ended. 
+ * Called when a Spark job is ended.
  * @param {Object} data - The data from the spark listener event.
  */
 SparkMonitor.prototype.onSparkJobEnd = function (data) {
@@ -235,7 +246,7 @@ SparkMonitor.prototype.onSparkJobEnd = function (data) {
 }
 
 /**
- * Called when a Spark stage is submitted. 
+ * Called when a Spark stage is submitted.
  * @param {Object} data - The data from the spark listener event.
  */
 SparkMonitor.prototype.onSparkStageSubmitted = function (data) {
@@ -253,7 +264,7 @@ SparkMonitor.prototype.onSparkStageSubmitted = function (data) {
 }
 
 /**
- * Called when a Spark stage is completed. 
+ * Called when a Spark stage is completed.
  * @param {Object} data - The data from the spark listener event.
  */
 SparkMonitor.prototype.onSparkStageCompleted = function (data) {
@@ -267,7 +278,7 @@ SparkMonitor.prototype.onSparkStageCompleted = function (data) {
 }
 
 /**
- * Called when a Spark task is started. 
+ * Called when a Spark task is started.
  * @param {Object} data - The data from the spark listener event.
  */
 SparkMonitor.prototype.onSparkTaskStart = function (data) {
@@ -281,7 +292,7 @@ SparkMonitor.prototype.onSparkTaskStart = function (data) {
 }
 
 /**
- * Called when a Spark task is ended. 
+ * Called when a Spark task is ended.
  * @param {Object} data - The data from the spark listener event.
  */
 SparkMonitor.prototype.onSparkTaskEnd = function (data) {
@@ -295,7 +306,7 @@ SparkMonitor.prototype.onSparkTaskEnd = function (data) {
 }
 
 /**
- * Called when a Spark Application is ended. 
+ * Called when a Spark Application is ended.
  * @param {Object} data - The data from the spark listener event.
  */
 
@@ -304,7 +315,7 @@ SparkMonitor.prototype.onSparkApplicationEnd = function (data) {
 }
 
 /**
- * Called when a Spark Application is started. 
+ * Called when a Spark Application is started.
  * @param {Object} data - The data from the spark listener event.
  */
 SparkMonitor.prototype.onSparkApplicationStart = function (data) {
@@ -329,7 +340,7 @@ SparkMonitor.prototype.onSparkExecutorAdded = function (data) {
 }
 
 /**
- * Called when a Spark executor is removed. 
+ * Called when a Spark executor is removed.
  * @param {Object} data - The data from the spark listener event.
  */
 SparkMonitor.prototype.onSparkExecutorRemoved = function (data) {
@@ -344,7 +355,7 @@ SparkMonitor.prototype.onSparkExecutorRemoved = function (data) {
 
 /**
  * Delegates a received message to corresponding function.
- * 
+ *
  * @param {Object} msg - The JSON parsed message object.
  */
 SparkMonitor.prototype.handleMessage = function (msg) {
